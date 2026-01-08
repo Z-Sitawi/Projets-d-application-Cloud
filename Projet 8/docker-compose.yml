@@ -1,0 +1,4 @@
+services:
+  resource-agent:
+    build: .
+    image: jade-resource-agent
