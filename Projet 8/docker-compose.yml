@@ -1,4 +1,29 @@
+version: '3.8'
+
 services:
+  # Service 1: The Main Container (The Brain)
+  jade-main:
+    build: .
+    container_name: jade-main
+    ports:
+      - "1099:1099" # RMI Port
+      - "7778:7778" # MTP Port
+    # Launch JADE in GUI mode
+    command: java jade.Boot -name mycloud
+    networks:
+      - jade-net
+
+  # Service 2: The Scalable Agent
   resource-agent:
     build: .
-    image: jade-resource-agent
+    depends_on:
+      - jade-main
+    # Launch the agent and connect it to 'jade-main'
+    # Important: We do NOT set a nickname (like 'agent1') here.
+    # We let JADE generate the name so we can run copies without name conflicts.
+    command: java jade.Boot -container -host jade-main -agents ResourceAgent:agents.ResourceAgent
+    networks:
+      - jade-net
+
+networks:
+  jade-net:
